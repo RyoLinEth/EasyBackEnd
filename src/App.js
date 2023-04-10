@@ -1,23 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { useState, useEffect } from "react";
 function App() {
+  const [nftJson, setNftJson] = useState(null);
+  const [tokenID, setTokenId] = useState(null);
+
+  const currentURL = window.location.href;
+  if (currentURL.includes("?")) {
+    const tokenId = new URL(currentURL).searchParams.get('tokenId');
+    if (tokenID == null || tokenID != tokenId)
+      setTokenId(tokenId)
+  } else {
+    console.log("THE URL DO NOT INCLUDES ?")
+  }
+
+  useEffect(() => {
+    if (tokenID != null)
+      axios.get(`http://13.230.57.144:3000/json/${tokenID}.json`)
+        .then(response => {
+          const jsonString = JSON.stringify(response.data);
+          console.log(`{${jsonString}}`);
+          setNftJson(`{${jsonString}}`);
+        });
+  }, [tokenID]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {
+        nftJson !== null && <p>{nftJson}</p>
+      }
     </div>
   );
 }
